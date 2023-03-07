@@ -1,5 +1,6 @@
 const osc = require("osc");
-const MeatMelody = require("./meatmelody");
+const Fugue = require("./fugue");
+const eighth_note = 500;
 
 const udpPort = new osc.UDPPort({
     // This is the port we're listening on.
@@ -14,37 +15,24 @@ const udpPort = new osc.UDPPort({
 
 udpPort.open();
 
-let mm = new MeatMelody(57);
-mm.addChord(7);
+let fugue = new Fugue(57);
 
-mm.advancePosition();
 setInterval(() => {
-  let chords = mm.makeChords();
-  mm.advancePosition();
-  
-  let msg = {
-    address: "/chord",
-    args: []
-  };
-
-  chords.forEach(val => {
-    msg.args.push({
-      "type": "i",
-      "value": val
-    })
-  });
-
-  udpPort.send(msg);
-
-  let note = mm.makeNotes();
-  if (note !== -1) {
+  let note = fugue.getNote();
+  if (note[0] !== null) {
     msg = {
       address: "/note",
       args: [{
         "type": "i",
-        "value": note
+        "value": note[0]
+      }, {
+        "type": "f",
+        "value": (note[1] * eighth_note) / 1000
+      }, {
+        "type": "f",
+        "value": note[2]
       }]
     };
     udpPort.send(msg);
   }
-}, 500);
+}, eighth_note);
