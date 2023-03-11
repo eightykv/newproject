@@ -1,7 +1,8 @@
+(
 o = Server.default.options;
 o.inDevice_("ASIO : Focusrite USB ASIO");
 o.outDevice_("ASIO : Focusrite USB ASIO");
-
+)
 s.boot;
 
 

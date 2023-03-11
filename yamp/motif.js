@@ -1,6 +1,5 @@
 class Motif {
   // TODO: figure out how to vary the number of notes -- more for rep/arp, fewer for jump
-  #num_notes_prob = [2, 3, 3, 3, 4, 4, 4, 5, 5, 6]; // poor man's gaussian distribution
 
   static makeMotif(n, scale, rhythm) {
     let rand = Math.random();
@@ -14,7 +13,26 @@ class Motif {
     else {
       motif = Motif.jump(n, scale);
     }
-    return Motif.applyRhythm(motif, rhythm);
+    return [motif, Motif.applyRhythm(motif, rhythm)];
+  }
+
+  static makeEnding(n) {
+    let mending = Array(n).fill(null);
+    let rending = Array(n).fill(0);
+ 
+    let rand = Math.random();
+    if (rand < 0.5) {
+      mending[0] = 0;
+      rending[0] = n / 2; // n is time sig, will always be even
+    }
+    else {
+      mending[0] = -1;
+      rending[0] = 1;
+      mending[1] = 0;
+      rending[1] = 1;
+    }
+ 
+    return [mending, rending];
   }
 
   static rep(n) {
@@ -149,29 +167,24 @@ class Motif {
     }
     pattern[pattern.length - length] = length;
 
+    /*
     // Look I don't like these repeated for loops
     // Unfortunately it's the best way I could think
     // to do what I want
-    /*for (let i = 0; i < pattern.length; i++) {
+    for (let i = 0; i < pattern.length; i++) {
       // now scale
       let rand = Math.random();
       let pl = pattern[i];
       if (pl !== 0) {
         if (rand < 0.05) {
           // 5% chance of quarter length
-          if (pl !== 1) {
-            /*pl = 0.25;
-          }
-          else {
+          if (pl > 1) {
             pl = Math.max(1, Math.floor(pl/4));
           }
         }
         else if (rand < 0.15) {
           // 10% chance of length - 1
-          if (pl !== 1) {
-            /*pl = 0.5;
-          }
-          else {
+          if (pl > 1) {
             pl--;
           }
         }

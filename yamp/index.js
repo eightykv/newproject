@@ -1,6 +1,7 @@
 const osc = require("osc");
 const Fugue = require("./fugue");
-const eighth_note = 500;
+const note_length = [450, 275];
+let pos = 1;
 
 const udpPort = new osc.UDPPort({
     // This is the port we're listening on.
@@ -17,7 +18,7 @@ udpPort.open();
 
 let fugue = new Fugue(57);
 
-setInterval(() => {
+function sendNextNote() {
   let note = fugue.getNote();
   if (note[0] !== null) {
     msg = {
@@ -27,7 +28,7 @@ setInterval(() => {
         "value": note[0]
       }, {
         "type": "f",
-        "value": (note[1] * eighth_note) / 1000
+        "value": (note[1] * note_length[pos % 2]) / 1000
       }, {
         "type": "f",
         "value": note[2]
@@ -35,4 +36,9 @@ setInterval(() => {
     };
     udpPort.send(msg);
   }
-}, eighth_note);
+  pos++;
+  clearInterval(clock);
+  clock = setInterval(sendNextNote, note_length[pos % 2]);
+}
+
+let clock = setInterval(sendNextNote, note_length[pos % 2]);
